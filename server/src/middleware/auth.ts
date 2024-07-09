@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { CustomError } from "../utils/error";
+import { errorHandler } from "../utils/responseHandler";
 
 export const verifyToken = async (
   req: Request,
@@ -9,7 +11,7 @@ export const verifyToken = async (
   try {
     let token = req.header("Authorization");
     if (!token) {
-      return res.status(401).json({ error: "Access denied!" });
+      throw new CustomError(401, "Access Denied!");
     }
 
     if (token.startsWith("Bearer ")) {
@@ -18,11 +20,11 @@ export const verifyToken = async (
     token &&
       jwt.verify(token, process.env.JWT_SECRET as string, (error, _user) => {
         if (error) {
-          return res.status(403).json({ error: "Invalid token!" });
+          throw new CustomError(403, "Invalid access token!");
         }
       });
     next();
-  } catch (error) {
-    return res.status(500).json({ error: "Something went wrong!" });
+  } catch (error: any) {
+    return errorHandler(error, res);
   }
 };

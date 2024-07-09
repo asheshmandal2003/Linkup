@@ -3,8 +3,6 @@ import { prisma } from "../utils/prismaClient";
 import { CustomError } from "../utils/error";
 import { errorHandler } from "../utils/responseHandler";
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 export const doesExist = async (
   req: Request,
   res: Response,
