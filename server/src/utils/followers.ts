@@ -27,7 +27,5 @@ export async function checkFollow(id: string, userId: string) {
     },
   });
 
-  if (follow) {
-    throw new CustomError(400, "You are already following this user!");
-  }
+  return follow;
 }

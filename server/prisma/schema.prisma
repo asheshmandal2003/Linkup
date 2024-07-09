@@ -32,15 +32,20 @@ model User {
 }
 
 model Profile {
-  id        String    @id @default(uuid())
-  userId    String    @unique
-  user      User      @relation(name: "UserProfile", fields: [userId], references: [id], onDelete: Cascade)
-  isPrivate Boolean   @default(false)
-  avatar    String?
-  cover     String?
-  bio       String?
-  dob       DateTime?
-  location  String?
+  id            String         @id @default(uuid())
+  userId        String         @unique
+  user          User           @relation(name: "UserProfile", fields: [userId], references: [id], onDelete: Cascade)
+  isPrivate     Boolean        @default(false)
+  avatar        String?
+  cover         String?
+  bio           String?
+  dob           DateTime?
+  location      String?
+  posts         Post[]         @relation(name: "user_posts")
+  likedPosts    PostLike[]     @relation(name: "user_likes")
+  comments      Comment[]      @relation(name: "user_comments")
+  replies       Reply[]        @relation(name: "user_replies")
+  likedComments CommentLikes[] @relation(name: "user_comment_likes")
 }
 
 model Connection {
@@ -49,6 +54,66 @@ model Connection {
   followerId String
   followings User   @relation(name: "followings", fields: [userId], references: [id], onDelete: Cascade)
   followers  User   @relation(name: "followers", fields: [followerId], references: [id], onDelete: Cascade)
+}
+
+model Post {
+  id        String     @id @default(uuid())
+  profileId String
+  profile   Profile    @relation(name: "user_posts", fields: [profileId], references: [id], onDelete: Cascade)
+  image     String
+  caption   String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now())
+  likes     PostLike[] @relation(name: "post_likes")
+  comments  Comment[]  @relation(name: "post_comments")
+  hashtags  Hashtag[]  @relation(name: "post_hashtags")
+}
+
+model PostLike {
+  id        String  @id @default(uuid())
+  profileId String
+  postId    String
+  profile   Profile @relation(name: "user_likes", fields: [profileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  post      Post    @relation(name: "post_likes", fields: [postId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model Comment {
+  id        String         @id @default(uuid())
+  profileId String
+  postId    String
+  profile   Profile        @relation(name: "user_comments", fields: [profileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  post      Post           @relation(name: "post_comments", fields: [postId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  comment   String
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @default(now())
+  replies   Reply[]        @relation(name: "comment_replies")
+  likes     CommentLikes[] @relation(name: "comment_likes")
+}
+
+model Hashtag {
+  id      String @id @default(uuid())
+  postId  String
+  post    Post   @relation(name: "post_hashtags", fields: [postId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  hashtag String
+}
+
+model Reply {
+  id        String   @id @default(uuid())
+  userId    String
+  commentId String
+  profile   Profile  @relation(name: "user_replies", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  comment   Comment  @relation(name: "comment_replies", fields: [commentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  reply     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model CommentLikes {
+  id        String  @id @default(uuid())
+  profileId String
+  commentId String
+  profile   Profile @relation(name: "user_comment_likes", fields: [profileId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  comment   Comment @relation("comment_likes", fields: [commentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 enum Role {

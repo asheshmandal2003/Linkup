@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { prisma } from "../utils/prismaClient";
 import { errorHandler, successHandler } from "../utils/responseHandler";
 import { checkFollow, checkUsers } from "../utils/followers";
+import { CustomError } from "../utils/error";
 
 export const getFollowersCount = async (req: Request, res: Response) => {
   try {
@@ -112,7 +113,11 @@ export const follow = async (req: Request, res: Response) => {
     const { id, userId } = req.params;
 
     await checkUsers(id, userId);
-    await checkFollow(id, userId);
+    const follower = await checkFollow(id, userId);
+
+    if (follower) {
+      throw new CustomError(400, "You are already following this user!");
+    }
 
     await prisma.connection.create({
       data: {
