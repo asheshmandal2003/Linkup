@@ -6,11 +6,11 @@ import { CustomError } from "../utils/error";
 
 export const getFollowersCount = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { profileId } = req.params;
 
     const followersCount = await prisma.connection.count({
       where: {
-        userId: id,
+        userId: profileId,
       },
     });
 
@@ -24,11 +24,11 @@ export const getFollowersCount = async (req: Request, res: Response) => {
 
 export const getFollowingsCount = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { profileId } = req.params;
 
     const followingCount = await prisma.connection.count({
       where: {
-        followerId: id,
+        followerId: profileId,
       },
     });
 
@@ -42,23 +42,23 @@ export const getFollowingsCount = async (req: Request, res: Response) => {
 
 export const getFollowers = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { profileId } = req.params;
 
     const followers = await prisma.connection.findMany({
       where: {
-        userId: id,
+        userId: profileId,
       },
       select: {
         followers: {
           select: {
             id: true,
-            first_name: true,
-            last_name: true,
-            username: true,
-            profile: {
+            avatar: true,
+            user: {
               select: {
                 id: true,
-                avatar: true,
+                first_name: true,
+                last_name: true,
+                username: true,
               },
             },
           },
@@ -76,23 +76,23 @@ export const getFollowers = async (req: Request, res: Response) => {
 
 export const getFollowing = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { profileId } = req.params;
 
     const following = await prisma.connection.findMany({
       where: {
-        followerId: id,
+        followerId: profileId,
       },
       select: {
         followings: {
           select: {
             id: true,
-            first_name: true,
-            last_name: true,
-            username: true,
-            profile: {
+            avatar: true,
+            user: {
               select: {
                 id: true,
-                avatar: true,
+                first_name: true,
+                last_name: true,
+                username: true,
               },
             },
           },
@@ -110,10 +110,10 @@ export const getFollowing = async (req: Request, res: Response) => {
 
 export const follow = async (req: Request, res: Response) => {
   try {
-    const { id, userId } = req.params;
+    const { profileId, friendProfileId } = req.params;
 
-    await checkUsers(id, userId);
-    const follower = await checkFollow(id, userId);
+    await checkUsers(profileId, friendProfileId);
+    const follower = await checkFollow(profileId, friendProfileId);
 
     if (follower) {
       throw new CustomError(400, "You are already following this user!");
@@ -121,8 +121,8 @@ export const follow = async (req: Request, res: Response) => {
 
     await prisma.connection.create({
       data: {
-        userId,
-        followerId: id,
+        userId: friendProfileId,
+        followerId: profileId,
       },
     });
 
@@ -136,14 +136,14 @@ export const follow = async (req: Request, res: Response) => {
 
 export const unfollow = async (req: Request, res: Response) => {
   try {
-    const { id, userId } = req.params;
+    const { profileId, friendProfileId } = req.params;
 
-    await checkUsers(id, userId);
+    await checkUsers(profileId, friendProfileId);
 
     await prisma.connection.deleteMany({
       where: {
-        userId,
-        followerId: id,
+        userId: friendProfileId,
+        followerId: profileId,
       },
     });
 

@@ -16,6 +16,11 @@ export const findUser = async (identity: string) => {
         email: true,
         password: true,
         role: true,
+        profile: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   } else {
@@ -31,6 +36,11 @@ export const findUser = async (identity: string) => {
         email: true,
         password: true,
         role: true,
+        profile: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }

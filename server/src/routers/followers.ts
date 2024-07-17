@@ -6,13 +6,16 @@ import {
   getFollowingsCount,
   unfollow,
 } from "../controllers/followers";
-import { verifyToken } from "../middleware/auth";
+import { verifyToken } from "../middleware/authentication";
 import { router } from "../utils/router";
 
-router.route("/:id/followers/count").get(getFollowersCount);
-router.route("/:id/followers").get(getFollowers);
-router.route("/:id/follow/:userId").put(follow).delete(unfollow);
-router.route("/:id/followings/count").get(getFollowingsCount);
-router.route("/:id/followings").get(getFollowing);
+router.route("/:profileId/followers/count").get(getFollowersCount);
+router.route("/:profileId/followers").get(getFollowers);
+router
+  .route("/:profileId/follow/:friendProfileId")
+  .put(follow)
+  .delete(unfollow);
+router.route("/:profileId/followings/count").get(getFollowingsCount);
+router.route("/:profileId/followings").get(getFollowing);
 
 export default router;

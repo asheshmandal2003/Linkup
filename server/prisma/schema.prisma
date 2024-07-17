@@ -14,19 +14,17 @@ datasource db {
 }
 
 model User {
-  id             String       @id @default(uuid())
-  first_name     String
-  last_name      String
-  username       String       @unique
-  email          String       @unique
-  password       String
-  role           Role         @default(USER)
-  verified       Boolean      @default(false)
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @default(now())
-  profile        Profile?     @relation(name: "UserProfile")
-  userFollowers  Connection[] @relation(name: "followers")
-  userFollowings Connection[] @relation(name: "followings")
+  id         String   @id @default(uuid())
+  first_name String
+  last_name  String
+  username   String   @unique
+  email      String   @unique
+  password   String
+  role       Role     @default(USER)
+  verified   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+  profile    Profile? @relation(name: "UserProfile")
 
   @@index([email, username])
 }
@@ -46,14 +44,16 @@ model Profile {
   comments      Comment[]      @relation(name: "user_comments")
   replies       Reply[]        @relation(name: "user_replies")
   likedComments CommentLikes[] @relation(name: "user_comment_likes")
+  followers     Connection[]   @relation(name: "followers")
+  followings    Connection[]   @relation(name: "followings")
 }
 
 model Connection {
-  id         String @id @default(uuid())
+  id         String  @id @default(uuid())
   userId     String
   followerId String
-  followings User   @relation(name: "followings", fields: [userId], references: [id], onDelete: Cascade)
-  followers  User   @relation(name: "followers", fields: [followerId], references: [id], onDelete: Cascade)
+  followings Profile @relation(name: "followings", fields: [userId], references: [id], onDelete: Cascade)
+  followers  Profile @relation(name: "followers", fields: [followerId], references: [id], onDelete: Cascade)
 }
 
 model Post {
